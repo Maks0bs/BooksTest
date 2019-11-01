@@ -11,6 +11,7 @@ import com.example.bookstest2.fragments.BooksFragment;
 import com.example.bookstest2.fragments.GoogleplayFragment;
 import com.example.bookstest2.fragments.HomeFragment;
 import com.example.bookstest2.fragments.YoutubeFragment;
+import com.example.bookstest2.utils.HTTPQueryUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainActivity extends AppCompatActivity {

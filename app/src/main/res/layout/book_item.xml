@@ -13,8 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:padding="8dp"
-        android:src="@drawable/ic_navigation_youtube_24dp" />
+        android:padding="8dp"/>
 
     <TextView
         android:id="@+id/TextView_book_title"
@@ -49,8 +48,7 @@
         android:paddingBottom="1dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textSize="12sp"
-        android:text="TESTESTETSTE"/>
+        android:textSize="12sp"/>
 
     <!-- LinearLayout with Ebook, rating number and imageview for rating star-->
     <LinearLayout
@@ -75,7 +73,6 @@
             android:layout_height="wrap_content"
             android:paddingRight="4dp"
             android:paddingEnd="4dp"
-            android:text="E-Book"
             android:textSize="12sp"
             />
 
@@ -83,7 +80,6 @@
             android:id="@+id/TextView_rating_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4.9"
             android:textSize="12sp"
             android:paddingRight="2dp"
             android:paddingEnd="2dp"/>
@@ -117,8 +113,7 @@
         android:paddingBottom="1dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textSize="12sp"
-        android:text="TESTESTETSTE"/>
+        android:textSize="12sp"/>
 
 
 

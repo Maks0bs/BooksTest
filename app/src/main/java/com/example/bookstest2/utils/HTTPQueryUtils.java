@@ -1,9 +1,11 @@
-package com.example.bookstest2;
+package com.example.bookstest2.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.example.bookstest2.BooksVolume;
 
 import org.json.JSONArray;
 import org.json.JSONException;

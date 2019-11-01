@@ -17,36 +17,42 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-import com.squareup.picasso.Picasso;
 
 import com.example.bookstest2.BooksVolume;
-import com.example.bookstest2.HTTPQueryUtils;
+import com.example.bookstest2.utils.HTTPQueryUtils;
 import com.example.bookstest2.R;
 import com.example.bookstest2.adapters.BooksAdapter;
 import com.example.bookstest2.loaders.BooksLoader;
+import com.example.bookstest2.utils.QueryTextUtils;
 
 import java.util.ArrayList;
 
 public class BooksFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<BooksVolume>> {
     private View mRootView = null;
+    private LoaderManager mLoaderManager= null;
     private SearchView mToolbarSearchView = null;
     private RelativeLayout.LayoutParams mSearchViewLayoutParams = null;
     private View.OnClickListener mSearchViewClickListener = null;
     private SearchView.OnCloseListener mSearchViewCloseListener = null;
+    private SearchView.OnQueryTextListener mSearchViewTextListener = null;
     private TextView mTextViewFragmentName = null;
     private ListView mListViewSearchResults = null;
     private ArrayList<BooksVolume> mArrayListBooks = null;
     private Context mContext = null; //may need to pass context to constructor!!!
     private BooksAdapter mBooksAdapter = null;
     private String mToolbarTitle = null;
+    private Context mFragmentContext = null;
     private String mSearchHint = null;//changed all types to static
+    private boolean mLoaderCreated = false;
 
     @Override
     public Loader<ArrayList<BooksVolume>> onCreateLoader(int id, Bundle args){
         //TODO temporary query, has to be put in through searchView on ToolBar
-        String searchQueryStr = "check";
+        String searchQueryStr = args.getString("query");
         String inputUrlStr = HTTPQueryUtils.BOOKS_API_START_STR;
         inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr;
+        Log.e("LOADER", "loader created");
+
         return new BooksLoader(getActivity(),inputUrlStr);
     }
 
@@ -54,11 +60,14 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoadFinished(@NonNull Loader<ArrayList<BooksVolume>> loader, ArrayList<BooksVolume> data) {
         mBooksAdapter.clear();
         mBooksAdapter.addAll(data);
+
+        Log.e("LOADER", "finished");
     }
 
     @Override
     public void onLoaderReset(@NonNull Loader<ArrayList<BooksVolume>> loader) {
         mBooksAdapter.clear();
+        Log.e("LOADER", "was reset");
     }
 
     public BooksFragment(String toolbarTitle, String searchHint){
@@ -71,6 +80,7 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
             @Override
             public void onClick(View v) {
                 Log.e("TEST", "searched");
+
                 mTextViewFragmentName.setVisibility(View.GONE);
                 mSearchViewLayoutParams.addRule(RelativeLayout.RIGHT_OF,
                         (mRootView.findViewById(R.id.imageView_random)).getId());
@@ -104,6 +114,27 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
             }
         };
 
+        mSearchViewTextListener = new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Bundle bundle = new Bundle();
+                bundle.putString("query", QueryTextUtils.prepareQueryForSubmission(query));
+                if (!mLoaderCreated){
+                    mLoaderManager.initLoader(0, bundle, BooksFragment.this);
+                    mLoaderCreated = true;
+                }
+                else{
+                    mLoaderManager.restartLoader(0, bundle, BooksFragment.this);
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        };
+
 
     }
 
@@ -113,6 +144,7 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
         Log.e(mToolbarTitle, "Created");
         mRootView = inflater.inflate(R.layout.fragment_search, container, false);
 
+        mLoaderManager = getLoaderManager();
         mContext = container.getContext();
 
         mTextViewFragmentName = (TextView) mRootView.findViewById(R.id.textView_fragment_name);
@@ -135,6 +167,7 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
         initListeners();
         mToolbarSearchView.setOnSearchClickListener(mSearchViewClickListener);
         mToolbarSearchView.setOnCloseListener(mSearchViewCloseListener);
+        mToolbarSearchView.setOnQueryTextListener(mSearchViewTextListener);
 
         /*mToolbarSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
@@ -184,9 +217,6 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
 
         mBooksAdapter = new BooksAdapter(container.getContext(), mArrayListBooks);
         mListViewSearchResults.setAdapter(mBooksAdapter);
-
-        LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, null, BooksFragment.this/*mCOntext...*/);
 
 
 

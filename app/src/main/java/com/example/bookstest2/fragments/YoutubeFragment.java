@@ -19,7 +19,7 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
 import com.example.bookstest2.BooksVolume;
-import com.example.bookstest2.HTTPQueryUtils;
+import com.example.bookstest2.utils.HTTPQueryUtils;
 import com.example.bookstest2.R;
 import com.example.bookstest2.adapters.BooksAdapter;
 import com.example.bookstest2.loaders.BooksLoader;

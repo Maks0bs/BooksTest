@@ -6,10 +6,9 @@ import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
 import com.example.bookstest2.BooksVolume;
-import com.example.bookstest2.HTTPQueryUtils;
+import com.example.bookstest2.utils.HTTPQueryUtils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class BooksLoader extends AsyncTaskLoader<ArrayList<BooksVolume>> {
     private String mUrlStr;
