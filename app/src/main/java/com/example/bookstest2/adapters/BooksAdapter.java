@@ -15,6 +15,8 @@ import com.example.bookstest2.R;//may not have to import
 
 import java.util.ArrayList;
 
+//testing
+
 public class BooksAdapter extends ArrayAdapter<BooksVolume> {
     public BooksAdapter(Context context, ArrayList<BooksVolume> array){
         super(context, 0, array);
