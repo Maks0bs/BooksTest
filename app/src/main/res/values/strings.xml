@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">BooksTest2</string>
+    <string name="button_bookSearch">Search</string>
+
+    <string name="navigation_books_str">Books</string>
+    <string name="navigation_youtube_str">YouTube</string>
+    <string name="navigation_googleplay_str">Google Play</string>
+    <string name="navigation_home_str">Home</string>
+
+    <string name="starting_hint">Choose what you want to search</string>
+    <string name="books_search_hint">Search in Google Books</string>
+    <string name="youtube_search_hint">Search in YouTube</string>
+    <string name="googleplay_search_hint">Search in Google play</string>
+
+</resources>

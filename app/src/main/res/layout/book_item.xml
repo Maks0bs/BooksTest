@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <!--TODO work with this imageView-->
+
+    <ImageView
+        android:id="@+id/imageView_book_thumbnail"
+        android:layout_width="48dp"
+        android:layout_height="72dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:padding="8dp"
+        android:src="@drawable/ic_navigation_youtube_24dp" />
+
+    <TextView
+        android:id="@+id/TextView_book_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imageView_book_thumbnail"
+        android:layout_toEndOf="@id/imageView_book_thumbnail"
+        android:layout_alignParentTop="true"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        android:paddingRight="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="1dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:id="@+id/TextView_book_authors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imageView_book_thumbnail"
+        android:layout_toEndOf="@id/imageView_book_thumbnail"
+        android:layout_below="@id/TextView_book_title"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        android:paddingRight="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="12sp"
+        android:text="TESTESTETSTE"/>
+
+    <!-- LinearLayout with Ebook, rating number and imageview for rating star-->
+    <LinearLayout
+        android:id="@+id/LinearLayout_ebook_rating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/TextView_book_authors"
+        android:layout_toRightOf="@id/imageView_book_thumbnail"
+        android:layout_toEndOf="@id/imageView_book_thumbnail"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        android:paddingRight="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:orientation="horizontal">
+
+        <!--textview, textview and imageview-->
+        <TextView
+            android:id="@+id/TextView_ebook_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="E-Book"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/TextView_rating_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4.9"
+            android:textSize="12sp"
+            android:paddingLeft="4dp"
+            android:paddingStart="4dp"
+            android:paddingRight="2dp"
+            android:paddingEnd="2dp"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/layout_rating_star"
+            android:adjustViewBounds="true"
+            android:maxHeight="12dp"
+            android:maxWidth="12dp"
+            android:layout_gravity="center_vertical"/>
+
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/TextView_book_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imageView_book_thumbnail"
+        android:layout_toEndOf="@id/imageView_book_thumbnail"
+        android:layout_below="@id/LinearLayout_ebook_rating"
+        android:paddingLeft="8dp"
+        android:paddingStart="8dp"
+        android:paddingRight="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="1dp"
+        android:paddingBottom="1dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textSize="12sp"
+        android:text="TESTESTETSTE"/>
+
+
+
+
+
+
+</RelativeLayout>
