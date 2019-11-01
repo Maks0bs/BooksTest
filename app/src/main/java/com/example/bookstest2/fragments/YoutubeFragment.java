@@ -1,15 +1,12 @@
 package com.example.bookstest2.fragments;
 
 import android.content.Context;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,17 +26,7 @@ import com.example.bookstest2.loaders.BooksLoader;
 
 import java.util.ArrayList;
 
-//testing this for commit
-
-//testing for another commit
-
-//testing for even another commit
-
-//123
-
-//another one
-
-public class SearchFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<BooksVolume>> {
+public class YoutubeFragment extends Fragment implements LoaderManager.LoaderCallbacks<ArrayList<BooksVolume>> {
     private View mRootView = null;
     private SearchView mToolbarSearchView = null;
     private RelativeLayout.LayoutParams mSearchViewLayoutParams = null;
@@ -73,7 +60,7 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
         mBooksAdapter.clear();
     }
 
-    public SearchFragment(String toolbarTitle, String searchHint){
+    public YoutubeFragment(String toolbarTitle, String searchHint){
         mToolbarTitle = toolbarTitle;
         mSearchHint = searchHint;
     }
@@ -190,15 +177,15 @@ public class SearchFragment extends Fragment implements LoaderManager.LoaderCall
 
         mArrayListBooks = new ArrayList<BooksVolume>();
         /*TODO
-        *   retrieve info from api here
-        *   set up "swipe to update" and loading 10 at a time to work here
-        */
+         *   retrieve info from api here
+         *   set up "swipe to update" and loading 10 at a time to work here
+         */
 
         mBooksAdapter = new BooksAdapter(container.getContext(), mArrayListBooks);
         mListViewSearchResults.setAdapter(mBooksAdapter);
 
         LoaderManager loaderManager = getLoaderManager();
-        loaderManager.initLoader(0, null, SearchFragment.this/*mCOntext...*/);
+        loaderManager.initLoader(0, null, YoutubeFragment.this/*mCOntext...*/);
 
 
 

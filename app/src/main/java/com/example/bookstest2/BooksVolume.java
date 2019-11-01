@@ -1,5 +1,7 @@
 package com.example.bookstest2;
 
+import android.graphics.Bitmap;
+
 public class BooksVolume {
     private String mTitle = "";
     private String mAuthor = "";
@@ -7,6 +9,7 @@ public class BooksVolume {
     private String mPrice = ""; //may need to change to smth else, there are different currencies that vary from location
     private String mThumbnailUrlStr = "";
     private double mRating;
+    private Bitmap mThumbnailBitmap = null;
     public static final double NO_RATING_PROVIDED = -1.0;//change to xml string value
     public static final String IS_EBOOK = "E-book";
     public static final String IS_NOT_EBOOK = "-";
@@ -19,13 +22,13 @@ public class BooksVolume {
         mPrice = price;
         mRating = rating;
     }
-    public BooksVolume(String title, String author, boolean isEBook, String price, double rating, String thumbnailUrl){
+    public BooksVolume(String title, String author, boolean isEBook, String price, double rating, Bitmap thumbnail){
         mTitle = title;
         mAuthor = author;
         mIsEBook = isEBook;
         mPrice = price;
         mRating = rating;
-        mThumbnailUrlStr = thumbnailUrl;
+        mThumbnailBitmap = thumbnail;
     }
 
     public String getTitle(){
@@ -42,5 +45,8 @@ public class BooksVolume {
     }
     public double getRating(){
         return mRating;
+    }
+    public Bitmap getThumbnailBitmap(){
+        return mThumbnailBitmap;
     }
 }

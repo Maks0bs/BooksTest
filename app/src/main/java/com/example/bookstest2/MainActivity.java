@@ -2,17 +2,16 @@ package com.example.bookstest2;
 
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.bookstest2.fragments.BooksFragment;
+import com.example.bookstest2.fragments.GoogleplayFragment;
 import com.example.bookstest2.fragments.HomeFragment;
-import com.example.bookstest2.fragments.SearchFragment;
+import com.example.bookstest2.fragments.YoutubeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     Fragment fragmentHome = new HomeFragment();
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case R.id.navigation_books:
                             if (fragmentBooks == null){
-                                fragmentBooks = new SearchFragment(
+                                fragmentBooks = new BooksFragment(
                                         getResources().getString(R.string.navigation_books_str),
                                         getResources().getString(R.string.books_search_hint)
                                 );
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case R.id.navigation_youtube:
                             if (fragmentYoutube == null){
-                                fragmentYoutube = new SearchFragment(
+                                fragmentYoutube = new YoutubeFragment(
                                         getResources().getString(R.string.navigation_youtube_str),
                                         getResources().getString(R.string.youtube_search_hint)
 
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case R.id.navigation_googleplay:
                             if (fragmentGoogleplay == null){
-                                fragmentGoogleplay = new SearchFragment(
+                                fragmentGoogleplay = new GoogleplayFragment(
                                         getResources().getString(R.string.navigation_googleplay_str),
                                         getResources().getString(R.string.googleplay_search_hint)
                                 );
@@ -88,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*TODO
-    *   Optional) Try to put HomeFragment in SearchFragment to reduce code
+    *   Optional) Try to put HomeFragment in BooksFragment to reduce code
     *   1) !!!!!!!!!!!!!!!!!change xml book_item to display all book info
     *   2) Look to do in HTTPQUERYUTILS
     *   3) Implement api logic!!!

@@ -34,7 +34,7 @@ public class HomeFragment extends Fragment {
         Log.e("Home", "Created");
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mTextViewFragmentName = (TextView) rootView.findViewById(R.id.textView_fragment_name);//may be problemtic because id names are the same as in SearchFragment
+        mTextViewFragmentName = (TextView) rootView.findViewById(R.id.textView_fragment_name);//may be problemtic because id names are the same as in BooksFragment
         mTextViewFragmentName.setText(mToolbarTitle);
 
         return rootView;
