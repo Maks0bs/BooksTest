@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.bookstest2.BooksVolume;
+import com.example.bookstest2.utils.BooksVolume;
 import com.example.bookstest2.R;//may not have to import
 
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ public class BooksAdapter extends ArrayAdapter<BooksVolume> {
     private ImageView mImageViewRatingStar = null;
     private TextView mTextViewRatingNumber = null;
     private TextView mTextViewBookPrice = null;
+    private TextView mTextViewEmpty = null;
 
     @NonNull
     @Override
@@ -47,6 +48,7 @@ public class BooksAdapter extends ArrayAdapter<BooksVolume> {
         mTextViewEBookInfo = listView.findViewById(R.id.TextView_ebook_info);
         mTextViewRatingNumber = listView.findViewById(R.id.TextView_rating_number);
         mTextViewBookPrice = listView.findViewById(R.id.TextView_book_price);
+        mTextViewEmpty = listView.findViewById(R.id.TextView_list_empty);
 
         mImageViewThumbnail.setImageBitmap(curBookVolume.getThumbnailBitmap());
 

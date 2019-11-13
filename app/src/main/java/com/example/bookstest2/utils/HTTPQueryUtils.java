@@ -5,8 +5,6 @@ import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.example.bookstest2.BooksVolume;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,11 +16,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class HTTPQueryUtils {
     public static final String BOOKS_API_START_STR = " https://www.googleapis.com/books/";

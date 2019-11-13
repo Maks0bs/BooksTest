@@ -1,4 +1,4 @@
-package com.example.bookstest2;
+package com.example.bookstest2.utils;
 
 import android.graphics.Bitmap;
 

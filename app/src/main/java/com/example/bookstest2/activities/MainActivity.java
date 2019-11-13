@@ -1,4 +1,4 @@
-package com.example.bookstest2;
+package com.example.bookstest2.activities;
 
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.bookstest2.R;
 import com.example.bookstest2.fragments.BooksFragment;
 import com.example.bookstest2.fragments.GoogleplayFragment;
 import com.example.bookstest2.fragments.HomeFragment;
