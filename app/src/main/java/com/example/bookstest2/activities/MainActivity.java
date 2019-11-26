@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.bookstest2.R;
 import com.example.bookstest2.fragments.BooksFragment;
+import com.example.bookstest2.fragments.BooksFragmentRecycler;
 import com.example.bookstest2.fragments.GoogleplayFragment;
 import com.example.bookstest2.fragments.HomeFragment;
 import com.example.bookstest2.fragments.YoutubeFragment;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case R.id.navigation_books:
                             if (fragmentBooks == null){
-                                fragmentBooks = new BooksFragment(
+                                fragmentBooks = new BooksFragmentRecycler(
                                         getResources().getString(R.string.navigation_books_str),
                                         getResources().getString(R.string.books_search_hint)
                                 );
