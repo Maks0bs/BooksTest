@@ -43,6 +43,7 @@ public class BooksLoader extends AsyncTaskLoader<ArrayList<BooksVolume>> {
         HTTPQueryUtils.BooksQueryManager booksQueryManager =
                 new HTTPQueryUtils.BooksQueryManager(mUrlStr);
 
-        return booksQueryManager.retrieveBooksList();
+        ArrayList<BooksVolume> data = booksQueryManager.retrieveBooksList();
+        return data;
     }
 }

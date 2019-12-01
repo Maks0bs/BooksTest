@@ -1,11 +1,13 @@
 package com.example.bookstest2.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 
 
 
-public class BooksAdapterRecycler extends RecyclerView.Adapter<BooksAdapterRecycler.ViewHolder> {
+public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList<BooksVolume> mDataSet = null;
 
     public BooksAdapterRecycler(ArrayList<BooksVolume> data){
@@ -39,6 +41,11 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<BooksAdapterRecyc
 
         public ViewHolder(View v){
             super(v);
+            /*if (v.findViewById(R.id.ImageView_book_thumbnail) == null){//TODO may need to change this to smth normal
+                mProgressBarEmpty = v.findViewById(R.id.ProgressBar_empty);
+                return;
+            }*/
+
             mImageViewThumbnail = v.findViewById(R.id.ImageView_book_thumbnail);
             mTextViewBookTitle = v.findViewById(R.id.TextView_book_title);
             mTextViewBookAuthors = v.findViewById(R.id.TextView_book_authors);
@@ -47,6 +54,7 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<BooksAdapterRecyc
             mTextViewRatingNumber = v.findViewById(R.id.TextView_rating_number);
             mTextViewBookPrice = v.findViewById(R.id.TextView_book_price);
             mTextViewEmpty = v.findViewById(R.id.TextView_list_empty);
+
         }
 
         public TextView getTextViewBookTitle(){
@@ -73,57 +81,111 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<BooksAdapterRecyc
         public TextView getTextViewEmpty(){
             return mTextViewEmpty;
         }
+    }
 
 
+
+    public static class ViewFooter extends RecyclerView.ViewHolder{
+        private ProgressBar mProgressBarEmpty = null;
+
+
+        public ViewFooter(View v){
+            super(v);
+            if (v.findViewById(R.id.ImageView_book_thumbnail) == null){//TODO may need to change this to smth normal
+                mProgressBarEmpty = v.findViewById(R.id.ProgressBar_empty);
+                return;
+            }
+            mProgressBarEmpty = v.findViewById(R.id.ProgressBar_empty);
+        }
+
+        public ProgressBar getProgressBarEmpty() {
+            return mProgressBarEmpty;
+        }
+
+
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mDataSet.get(position).getTitle().equals(BooksVolume.LOADING_FOOTER)){
+            return 1;//TODO should change to static constants
+        }
+        else{
+            return 0;
+        }
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
-        View v = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.book_item, parent, false);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){//TODO make footer work with determining viewtype and acting accordingly
+        View v;
+        switch (viewType){
+            //TODO change to static constants
+            case 0:
+                v = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.book_item, parent, false);
+                return new ViewHolder(v);
+            default:
+                v = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.recycleview_footer, parent, false);
+                return new ViewFooter(v);
+        }
 
-        return new ViewHolder(v);
+
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position){
-        TextView curTextViewBookTitle = viewHolder.getTextViewBookTitle();
-        ImageView curImageViewThumbnail = viewHolder.getImageViewThumbnail();
-        TextView curTextViewBookAuthors = viewHolder.getTextViewBookAuthors();
-        TextView curTextViewEBookInfo = viewHolder.getTextViewEBookInfo();
-        ImageView curImageViewRatingStar = viewHolder.getImageViewRatingStar();
-        TextView curTextViewRatingNumber = viewHolder.getTextViewRatingNumber();
-        TextView curTextViewBookPrice = viewHolder.getTextViewBookPrice();
-        TextView mTextViewEmpty = viewHolder.getTextViewEmpty();
-        BooksVolume curBookVolume = mDataSet.get(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position){
+        if (getItemViewType(position) == 0){
+            ViewHolder vh = (ViewHolder) viewHolder;
 
+            TextView curTextViewBookTitle = vh.getTextViewBookTitle();
+            ImageView curImageViewThumbnail = vh.getImageViewThumbnail();
+            TextView curTextViewBookAuthors = vh.getTextViewBookAuthors();
+            TextView curTextViewEBookInfo = vh.getTextViewEBookInfo();
+            ImageView curImageViewRatingStar = vh.getImageViewRatingStar();
+            TextView curTextViewRatingNumber = vh.getTextViewRatingNumber();
+            TextView curTextViewBookPrice = vh.getTextViewBookPrice();
+            TextView curTextViewEmpty = vh.getTextViewEmpty();
 
-        curImageViewThumbnail.setImageBitmap(curBookVolume.getThumbnailBitmap());
+            BooksVolume curBookVolume = mDataSet.get(position);
 
-        curTextViewBookTitle.setText(curBookVolume.getTitle());
-        curTextViewBookAuthors.setText(curBookVolume.getAuthor());
-        if (curBookVolume.getIsEBook()){
-            curTextViewEBookInfo.setText("E-Book");//TODO change hardcoded str
+            curImageViewThumbnail.setImageBitmap(curBookVolume.getThumbnailBitmap());
+
+            curTextViewBookTitle.setText(curBookVolume.getTitle());
+            curTextViewBookAuthors.setText(curBookVolume.getAuthor());
+            if (curBookVolume.getIsEBook()){
+                curTextViewEBookInfo.setText("E-Book");//TODO change hardcoded str
+            }
+            else{
+                curTextViewEBookInfo.setVisibility(View.GONE);
+            }
+
+            if (curBookVolume.getRating() == BooksVolume.NO_RATING_PROVIDED){
+                curTextViewRatingNumber.setText("Not rated");//TODO change hardcoded str
+                curImageViewRatingStar.setVisibility(View.GONE);
+            }
+            else{
+                curTextViewRatingNumber.setText(String.valueOf(curBookVolume.getRating()));
+            }
+
+            if (curBookVolume.getPrice().equals(BooksVolume.NO_PRICE_PROVIDED)){
+                curTextViewBookPrice.setText("Not for sale");//TODO change hardcoded str
+            }
+            else{
+                curTextViewBookPrice.setText(curBookVolume.getPrice());
+            }
         }
         else{
-            curTextViewEBookInfo.setVisibility(View.GONE);
+            /*ViewFooter vh = (ViewFooter) viewHolder;
+            ProgressBar curProgressBarEmpty = vh.getProgressBarEmpty();*/
         }
 
-        if (curBookVolume.getRating() == BooksVolume.NO_RATING_PROVIDED){
-            curTextViewRatingNumber.setText("Not rated");//TODO change hardcoded str
-            curImageViewRatingStar.setVisibility(View.GONE);
-        }
-        else{
-            curTextViewRatingNumber.setText(String.valueOf(curBookVolume.getRating()));
-        }
 
-        if (curBookVolume.getPrice().equals(BooksVolume.NO_PRICE_PROVIDED)){
-            curTextViewBookPrice.setText("Not for sale");//TODO change hardcoded str
-        }
-        else{
-            curTextViewBookPrice.setText(curBookVolume.getPrice());
-        }
+
+        //Log.e("BOOK TITLE LOADED ADAPT", curBookVolume.getTitle());
+
+
     }
 
     @Override

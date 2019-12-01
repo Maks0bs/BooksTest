@@ -89,15 +89,17 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
     /*TODO
+    *   Urgent: Test if loader loads all elements in the correct order, i.e. doesn't skip any of them
+    *   Urgent: understand why pages in onLoadMore don't work correctly
     *   Optional) Try to put HomeFragment in BooksFragment to reduce code
-    *   1) !!!!!!!!!!!!!!!!!change xml book_item to display all book info
     *   2) Look to do in HTTPQUERYUTILS
     *   3) Implement api logic!!!
     *   4) Create separate QueryUtils subclasses for each query
     *   5) Add swipe up to refresh
-    *   6) Load 10 items at first, then add other 10 by tapping the button at the end of the listView
-    *   7) Visual polish
+    *   6) Visual polish
+    *   7) Code polish!!!
      */
 
 
