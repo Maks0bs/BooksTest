@@ -10,6 +10,7 @@ public class BooksVolume {
     private double mRating = 0.0;
     private Bitmap mThumbnailBitmap = null;
     public static final String LOADING_FOOTER = "#####";
+    public static final String NO_INTERNET_AVAILABLE = "NO_INTERNET_AVAILABLE";
     public static final double NO_RATING_PROVIDED = -1.0;//change to xml string value
     public static final String IS_EBOOK = "E-book";
     public static final String IS_NOT_EBOOK = "-";

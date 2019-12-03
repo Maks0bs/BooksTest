@@ -226,7 +226,7 @@ public class BooksFragment extends Fragment implements LoaderManager.LoaderCallb
         inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr;
         Log.e("LOADER", "loader created");
 
-        return new BooksLoader(getActivity(),inputUrlStr, mLoadingIndicatorStart);
+        return new BooksLoader(getActivity(),inputUrlStr);
     }
 
     @Override

@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bookstest2.utils.BooksVolume;
 import com.example.bookstest2.R;//may not have to import
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 
@@ -91,15 +93,25 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.View
 
         public ViewFooter(View v){
             super(v);
-            if (v.findViewById(R.id.ImageView_book_thumbnail) == null){//TODO may need to change this to smth normal
-                mProgressBarEmpty = v.findViewById(R.id.ProgressBar_empty);
-                return;
-            }
             mProgressBarEmpty = v.findViewById(R.id.ProgressBar_empty);
         }
 
         public ProgressBar getProgressBarEmpty() {
             return mProgressBarEmpty;
+        }
+    }
+
+    public static class ViewFooterNoInternet extends RecyclerView.ViewHolder{
+        private TextView mTextViewEmpty = null;
+
+        public ViewFooterNoInternet(View v){
+            super(v);
+
+            mTextViewEmpty = v.findViewById(R.id.TextView_empty);
+        }
+
+        public TextView getTextViewEmpty() {
+            return mTextViewEmpty;
         }
 
 
@@ -107,8 +119,12 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public int getItemViewType(int position) {
-        if (mDataSet.get(position).getTitle().equals(BooksVolume.LOADING_FOOTER)){
+        String title = mDataSet.get(position).getTitle();
+        if (title.equals(BooksVolume.LOADING_FOOTER)){
             return 1;//TODO should change to static constants
+        }
+        else if (title.equals(BooksVolume.NO_INTERNET_AVAILABLE)){
+            return -1;
         }
         else{
             return 0;
@@ -125,10 +141,14 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.View
                 v = LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.book_item, parent, false);
                 return new ViewHolder(v);
-            default:
+            case 1:
                 v = LayoutInflater.from(parent.getContext()).inflate(
                         R.layout.recycleview_footer, parent, false);
                 return new ViewFooter(v);
+            default:
+                v = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.recycleview_no_internet_footer, parent, false);
+                return new ViewFooterNoInternet(v);
         }
 
 
@@ -136,49 +156,48 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.View
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position){
-        if (getItemViewType(position) == 0){
-            ViewHolder vh = (ViewHolder) viewHolder;
+        switch (getItemViewType(position)){
+            case 0:
+                ViewHolder vh = (ViewHolder) viewHolder;
 
-            TextView curTextViewBookTitle = vh.getTextViewBookTitle();
-            ImageView curImageViewThumbnail = vh.getImageViewThumbnail();
-            TextView curTextViewBookAuthors = vh.getTextViewBookAuthors();
-            TextView curTextViewEBookInfo = vh.getTextViewEBookInfo();
-            ImageView curImageViewRatingStar = vh.getImageViewRatingStar();
-            TextView curTextViewRatingNumber = vh.getTextViewRatingNumber();
-            TextView curTextViewBookPrice = vh.getTextViewBookPrice();
-            TextView curTextViewEmpty = vh.getTextViewEmpty();
+                TextView curTextViewBookTitle = vh.getTextViewBookTitle();
+                ImageView curImageViewThumbnail = vh.getImageViewThumbnail();
+                TextView curTextViewBookAuthors = vh.getTextViewBookAuthors();
+                TextView curTextViewEBookInfo = vh.getTextViewEBookInfo();
+                ImageView curImageViewRatingStar = vh.getImageViewRatingStar();
+                TextView curTextViewRatingNumber = vh.getTextViewRatingNumber();
+                TextView curTextViewBookPrice = vh.getTextViewBookPrice();
 
-            BooksVolume curBookVolume = mDataSet.get(position);
+                BooksVolume curBookVolume = mDataSet.get(position);
 
-            curImageViewThumbnail.setImageBitmap(curBookVolume.getThumbnailBitmap());
+                curImageViewThumbnail.setImageBitmap(curBookVolume.getThumbnailBitmap());
 
-            curTextViewBookTitle.setText(curBookVolume.getTitle());
-            curTextViewBookAuthors.setText(curBookVolume.getAuthor());
-            if (curBookVolume.getIsEBook()){
-                curTextViewEBookInfo.setText("E-Book");//TODO change hardcoded str
-            }
-            else{
-                curTextViewEBookInfo.setVisibility(View.GONE);
-            }
+                curTextViewBookTitle.setText(curBookVolume.getTitle());
+                curTextViewBookAuthors.setText(curBookVolume.getAuthor());
+                if (curBookVolume.getIsEBook()) {
+                    curTextViewEBookInfo.setText("E-Book");//TODO change hardcoded str
+                } else {
+                    curTextViewEBookInfo.setVisibility(View.GONE);
+                }
 
-            if (curBookVolume.getRating() == BooksVolume.NO_RATING_PROVIDED){
-                curTextViewRatingNumber.setText("Not rated");//TODO change hardcoded str
-                curImageViewRatingStar.setVisibility(View.GONE);
-            }
-            else{
-                curTextViewRatingNumber.setText(String.valueOf(curBookVolume.getRating()));
-            }
+                if (curBookVolume.getRating() == BooksVolume.NO_RATING_PROVIDED) {
+                    curTextViewRatingNumber.setText("Not rated");//TODO change hardcoded str
+                    curImageViewRatingStar.setVisibility(View.GONE);
+                } else {
+                    curTextViewRatingNumber.setText(String.valueOf(curBookVolume.getRating()));
+                }
 
-            if (curBookVolume.getPrice().equals(BooksVolume.NO_PRICE_PROVIDED)){
-                curTextViewBookPrice.setText("Not for sale");//TODO change hardcoded str
-            }
-            else{
-                curTextViewBookPrice.setText(curBookVolume.getPrice());
-            }
-        }
-        else{
-            /*ViewFooter vh = (ViewFooter) viewHolder;
-            ProgressBar curProgressBarEmpty = vh.getProgressBarEmpty();*/
+                if (curBookVolume.getPrice().equals(BooksVolume.NO_PRICE_PROVIDED)) {
+                    curTextViewBookPrice.setText("Not for sale");//TODO change hardcoded str
+                } else {
+                    curTextViewBookPrice.setText(curBookVolume.getPrice());
+                }
+                return;
+            case -1:
+                TextView curTextViewEmpty = ((ViewFooterNoInternet) viewHolder).getTextViewEmpty();
+                curTextViewEmpty.setText("NO INTERNET");
+            default:
+                return;
         }
 
 

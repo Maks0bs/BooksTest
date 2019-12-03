@@ -91,8 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*TODO
+    *   !!!IMPORTANT: it may not be possible to create loaders with same IDs in each fragment
     *   Urgent: Test if loader loads all elements in the correct order, i.e. doesn't skip any of them
-    *   Urgent: understand why pages in onLoadMore don't work correctly
+    *   Urgent: Add behaviour dependent on current internet connection
     *   Optional) Try to put HomeFragment in BooksFragment to reduce code
     *   2) Look to do in HTTPQUERYUTILS
     *   3) Implement api logic!!!

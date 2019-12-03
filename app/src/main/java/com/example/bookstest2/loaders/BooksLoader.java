@@ -14,13 +14,7 @@ import java.util.ArrayList;
 
 public class BooksLoader extends AsyncTaskLoader<ArrayList<BooksVolume>> {
     private String mUrlStr;
-    private ProgressBar mProgressBar = null;
-
-    public BooksLoader(Context context, String url, ProgressBar progressBar){
-        super(context);
-        mUrlStr = url;
-        mProgressBar = progressBar;
-    }
+    //private ProgressBar mProgressBar = null;
 
     public BooksLoader(Context context, String url){
         super(context);
@@ -30,9 +24,6 @@ public class BooksLoader extends AsyncTaskLoader<ArrayList<BooksVolume>> {
     @Nullable
     @Override
     protected void onStartLoading() {
-        if (mProgressBar != null){
-            mProgressBar.setVisibility(View.VISIBLE);
-        }
         forceLoad();
     }
 

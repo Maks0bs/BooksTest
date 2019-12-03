@@ -60,8 +60,6 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
     private String mToolbarTitle = null;
     private String mCurrentQuery = null;
     private String mSearchHint = null;//changed all types to static
-    private boolean mLoaderCreated = false;
-    private boolean mInternetAvailable = true;
     private boolean mLoaderWorking = false; //TODO may need to change to smth else to work propelrly!!!
 
     public boolean getLoaderWorking(){
@@ -81,6 +79,8 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
             public boolean onQueryTextSubmit(String query) {
                 Bundle bundle = new Bundle();
                 bundle.putString("query", QueryTextUtils.prepareQueryForSubmission(query));
+                bundle.putBoolean("newQuery", true);
+                bundle.putInt("startIndex", 0);//!!!
                 mCurrentQuery = query;
                 if (mLoaderManager.getLoader(0) == null){
                     mLoaderManager.initLoader(0, bundle, BooksFragmentRecycler.this);
@@ -112,11 +112,12 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
                 Bundle bundle = new Bundle();
                 bundle.putString("query", mCurrentQuery);
                 bundle.putInt("startIndex", totalItemsCount);//!!!
-                if (mLoaderManager.getLoader(1) == null){
-                    mLoaderManager.initLoader(1, bundle, BooksFragmentRecycler.this);
+                bundle.putBoolean("newQuery", false);
+                if (mLoaderManager.getLoader(0) == null){
+                    mLoaderManager.initLoader(0, bundle, BooksFragmentRecycler.this);
                 }
                 else{
-                    mLoaderManager.restartLoader(1, bundle, BooksFragmentRecycler.this);
+                    mLoaderManager.restartLoader(0, bundle, BooksFragmentRecycler.this);
                 }
 
                 //TODO implement loading next data, maybe with the same method as original loading
@@ -142,6 +143,16 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
                             mRecyclerViewSearchResults.addOnScrollListener(mRecyclerScrollListener);
                         }
                         else{
+                            if (mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(
+                                    BooksVolume.NO_INTERNET_AVAILABLE)){
+                                mArrayListBooks.remove(mArrayListBooks.size() - 1);
+                                mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
+                                mRecyclerScrollListener.onLoadMore(
+                                        0,
+                                        mArrayListBooks.size() + 1,
+                                        mRecyclerViewSearchResults
+                                );
+                            }
                             mToolbarSearchView.setOnQueryTextListener(mSearchViewTextListener);
                         }
                         mEmptyTextViewStart.setVisibility(View.GONE);
@@ -149,8 +160,22 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
                     else
                     if (networkInfo != null && networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
                         mToolbarSearchView.setOnQueryTextListener(null);
-                        mEmptyTextViewStart.setVisibility(View.VISIBLE);
-                        mEmptyTextViewStart.setText("NO INTERNET");
+                        if (mLoaderManager.getLoader(0) == null){
+                            mEmptyTextViewStart.setVisibility(View.VISIBLE);
+                            mEmptyTextViewStart.setText("NO INTERNET");
+                        }
+                        else{
+                            if (mLoaderWorking){
+                                mArrayListBooks.set(mArrayListBooks.size() - 1,
+                                        new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
+                                mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 1);
+                            }
+                            else{
+                                mArrayListBooks.add(new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
+                                mBooksAdapter.notifyItemInserted(mArrayListBooks.size());
+                            }
+                        }
+
                     }
                 }
                 /*if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
@@ -268,58 +293,54 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
 
     @Override
     public Loader<ArrayList<BooksVolume>> onCreateLoader(int id, Bundle args){
-        if (id == 0){
-            mArrayListBooks.clear();//clear ADAPTER
-        }
-
+        Log.e("LOADER", "loader created");
         mLoaderWorking = true;
 
-        String searchQueryStr = args.getString("query");
-        String inputUrlStr = HTTPQueryUtils.BOOKS_API_START_STR;
-        inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr;
-        if (id == 1){
-            inputUrlStr = inputUrlStr + "&startIndex=" + String.valueOf(args.getInt("startIndex"));
+        boolean newQuery = args.getBoolean("newQuery");
+        if (newQuery){
+            mArrayListBooks.clear();
+            mLoadingIndicatorStart.setVisibility(View.VISIBLE);
         }
-        Log.e("LOADER", "loader created");
-        if (id == 1){
+        else{
             /*mArrayListBooks.add(new BooksVolume(BooksVolume.LOADING_FOOTER));
             mBooksAdapter.notifyItemInserted(mArrayListBooks.size() - 1);*/
             //mBooksAdapter.createViewHolder(mRecyclerViewSearchResults, 1);
-            //mBooksAdapter.notifyItemInserted(mArrayListBooks.size());
             mArrayListBooks.add(new BooksVolume(BooksVolume.LOADING_FOOTER));
+            mBooksAdapter.notifyItemInserted(mArrayListBooks.size());
             //handle viewType in oncreateView and ViewHolder constructor
         }
 
+        String searchQueryStr = args.getString("query");
+        String inputUrlStr = HTTPQueryUtils.BOOKS_API_START_STR;
+        inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr +
+                "&startIndex=" + String.valueOf(args.getInt("startIndex"));
 
-
-        return new BooksLoader(getActivity(), inputUrlStr, mLoadingIndicatorStart);
+        return new BooksLoader(getActivity(), inputUrlStr);
     }
 
     @Override
     public void onLoadFinished(@NonNull Loader<ArrayList<BooksVolume>> loader, ArrayList<BooksVolume> data) {
         //clearAdapter
         //mArrayListBooks.clear();
-        if (mArrayListBooks.size() > 0){
-            mArrayListBooks.remove(mArrayListBooks.size() - 1);
-            /*mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
-            mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 9,);*/
-        }
-        mArrayListBooks.addAll(data);
-
-        for (int i = 0; i < mArrayListBooks.size(); i++){
-            Log.e("ARRAYLISTELEMENTS", i + " " + mArrayListBooks.get(i).getTitle());
-
-        }
-
-
-
-        Log.e("-----", "------------");
 
         mLoadingIndicatorStart.setVisibility(View.GONE);
 
-        mLoaderWorking = false;
+        if (mArrayListBooks.size() > 0){
+            mArrayListBooks.remove(mArrayListBooks.size() - 1);
+            mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
+            /*mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 9,);*/
+        }
+        if (data != null){
+            mArrayListBooks.addAll(data);
+        }
 
+        for (int i = 0; i < mArrayListBooks.size(); i++){
+            Log.e("ARRAYLISTELEMENTS", i + " " + mArrayListBooks.get(i).getTitle());
+        }
+        Log.e("-----", "------------");
         Log.e("LOADER", "finished");
+
+        mLoaderWorking = false;
     }
 
     @Override
@@ -327,6 +348,6 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
         Log.e("LOADER", "was reset");
         mArrayListBooks.clear();
         mRecyclerScrollListener.resetState();
-
+        mLoadingIndicatorStart.setVisibility(View.VISIBLE);
     }
 }
