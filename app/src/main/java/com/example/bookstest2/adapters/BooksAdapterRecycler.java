@@ -43,10 +43,7 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.View
 
         public ViewHolder(View v){
             super(v);
-            /*if (v.findViewById(R.id.ImageView_book_thumbnail) == null){//TODO may need to change this to smth normal
-                mProgressBarEmpty = v.findViewById(R.id.ProgressBar_empty);
-                return;
-            }*/
+
 
             mImageViewThumbnail = v.findViewById(R.id.ImageView_book_thumbnail);
             mTextViewBookTitle = v.findViewById(R.id.TextView_book_title);
@@ -133,7 +130,7 @@ public class BooksAdapterRecycler extends RecyclerView.Adapter<RecyclerView.View
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){//TODO make footer work with determining viewtype and acting accordingly
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
         View v;
         switch (viewType){
             //TODO change to static constants

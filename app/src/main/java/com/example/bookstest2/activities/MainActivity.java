@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.bookstest2.R;
-import com.example.bookstest2.fragments.BooksFragment;
 import com.example.bookstest2.fragments.BooksFragmentRecycler;
 import com.example.bookstest2.fragments.GoogleplayFragment;
 import com.example.bookstest2.fragments.HomeFragment;
@@ -92,9 +91,9 @@ public class MainActivity extends AppCompatActivity {
 
     /*TODO
     *   !!!IMPORTANT: it may not be possible to create loaders with same IDs in each fragment
-    *   Urgent: Test if loader loads all elements in the correct order, i.e. doesn't skip any of them
-    *   Urgent: Add behaviour dependent on current internet connection
-    *   Optional) Try to put HomeFragment in BooksFragment to reduce code
+    *   Urgent: fix problem with visibility of RecycleView at first (due to RefreshLayout)
+    *   Urgent: handle showing no internet sign when internet is turned off while loading (when bitmaps don't have time to get downloaded)
+    *   Urgent: when going to main screen, while loading, loader gets called 2 times, but onLoadMore only one time (wtf), one element in ArrayList disappears
     *   2) Look to do in HTTPQUERYUTILS
     *   3) Implement api logic!!!
     *   4) Create separate QueryUtils subclasses for each query

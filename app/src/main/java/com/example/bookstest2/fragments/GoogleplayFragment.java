@@ -46,7 +46,8 @@ public class GoogleplayFragment extends Fragment implements LoaderManager.Loader
         String searchQueryStr = "check";
         String inputUrlStr = HTTPQueryUtils.BOOKS_API_START_STR;
         inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr;
-        return new BooksLoader(getActivity(),inputUrlStr);
+        //return new BooksLoader(getActivity(),inputUrlStr);
+        return null;
     }
 
     @Override

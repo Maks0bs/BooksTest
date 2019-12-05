@@ -25,6 +25,8 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.test.espresso.action.Swipe;
 
 import com.example.bookstest2.adapters.BooksAdapterRecycler;
 import com.example.bookstest2.listeners.EndlessRecyclerViewScrollListener;
@@ -43,6 +45,7 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
     private LoaderManager mLoaderManager= null;
     private SearchView mToolbarSearchView = null;
     private RelativeLayout.LayoutParams mSearchViewLayoutParams = null;
+    private SwipeRefreshLayout mSwipeRefreshLayout = null;
     private View.OnClickListener mSearchViewClickListener = null;
     private SearchView.OnCloseListener mSearchViewCloseListener = null;
     private SearchView.OnQueryTextListener mSearchViewTextListener = null;
@@ -60,11 +63,9 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
     private String mToolbarTitle = null;
     private String mCurrentQuery = null;
     private String mSearchHint = null;//changed all types to static
-    private boolean mLoaderWorking = false; //TODO may need to change to smth else to work propelrly!!!
+    private String mCurrentInternetConnection = null;
 
-    public boolean getLoaderWorking(){
-        return mLoaderWorking;
-    }
+    //private int mCurrent
 
     public BooksFragmentRecycler(String toolbarTitle, String searchHint){
         mToolbarTitle = toolbarTitle;
@@ -105,7 +106,7 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 //loadNextDataFromApi(page);
-                if (mLoaderWorking){
+                if (mLoaderManager.hasRunningLoaders()){
                     return;
                 }
                 Log.e("LOADMORE", page + " " + totalItemsCount);
@@ -134,38 +135,49 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
                     NetworkInfo networkInfo = (NetworkInfo)
                             intent.getExtras().get(ConnectivityManager.EXTRA_NETWORK_INFO);
 
-                    if(networkInfo != null && networkInfo.getState() == NetworkInfo.State.CONNECTED) {
+                    if(networkInfo != null &&
+                            (networkInfo.getState() == NetworkInfo.State.CONNECTED ||
+                             networkInfo.getState() == NetworkInfo.State.CONNECTING)) {
+                        mCurrentInternetConnection = "CONNECTED";
                         Log.e("app", "Network " + networkInfo.getTypeName()+" connected");
                         mEmptyTextViewStart.setVisibility(View.GONE);
                         if (mLoaderManager.getLoader(0) == null/*!mLoaderCreated*/){
                             initQueryListeners();
-                            mToolbarSearchView.setOnQueryTextListener(mSearchViewTextListener);
-                            mRecyclerViewSearchResults.addOnScrollListener(mRecyclerScrollListener);
                         }
-                        else{
-                            if (mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(
-                                    BooksVolume.NO_INTERNET_AVAILABLE)){
-                                mArrayListBooks.remove(mArrayListBooks.size() - 1);
-                                mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
-                                mRecyclerScrollListener.onLoadMore(
-                                        0,
-                                        mArrayListBooks.size() + 1,
-                                        mRecyclerViewSearchResults
-                                );
-                            }
-                            mToolbarSearchView.setOnQueryTextListener(mSearchViewTextListener);
+
+
+                        if (mArrayListBooks.size() > 0 &&
+                                mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(
+                                BooksVolume.NO_INTERNET_AVAILABLE)){
+                            mArrayListBooks.remove(mArrayListBooks.size() - 1);
+                            mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
+
                         }
+                        else if (mArrayListBooks.size() > 0 &&
+                                mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(
+                                BooksVolume.LOADING_FOOTER)){
+                            //mLoaderManager.destroyLoader();
+                            Log.e("initQueryReceivers", "last element in array is LOADING_FOOTER");
+                        }
+
+                        mRecyclerViewSearchResults.addOnScrollListener(mRecyclerScrollListener);
+                        mToolbarSearchView.setOnQueryTextListener(mSearchViewTextListener);
                         mEmptyTextViewStart.setVisibility(View.GONE);
                     }
-                    else
-                    if (networkInfo != null && networkInfo.getState() == NetworkInfo.State.DISCONNECTED) {
+                    else if (networkInfo != null &&
+                            (networkInfo.getState() == NetworkInfo.State.DISCONNECTED ||
+                             networkInfo.getState() == NetworkInfo.State.DISCONNECTING)) {//TODO may need to hande DISCONNECTING seperately
+                        mCurrentInternetConnection = "DISCONNECTED";
                         mToolbarSearchView.setOnQueryTextListener(null);
-                        if (mLoaderManager.getLoader(0) == null){
+                        mRecyclerViewSearchResults.removeOnScrollListener(mRecyclerScrollListener);
+                        if (mArrayListBooks.size() == 0 && mLoaderManager.getLoader(0) == null){
                             mEmptyTextViewStart.setVisibility(View.VISIBLE);
                             mEmptyTextViewStart.setText("NO INTERNET");
                         }
                         else{
-                            if (mLoaderWorking){
+                            if (mLoaderManager.hasRunningLoaders() &&
+                                mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle() ==
+                                BooksVolume.LOADING_FOOTER){
                                 mArrayListBooks.set(mArrayListBooks.size() - 1,
                                         new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
                                 mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 1);
@@ -174,17 +186,23 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
                                 mArrayListBooks.add(new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
                                 mBooksAdapter.notifyItemInserted(mArrayListBooks.size());
                             }
+                            //TODO see how to handle the change of loader:
+                            //mLoaderManager.destroyLoader(0);
                         }
 
+                    }
+                    else if (networkInfo == null ||
+                             networkInfo.getState() == NetworkInfo.State.UNKNOWN){
+                        mCurrentInternetConnection = "UNKNOWN";
+                        mEmptyTextViewStart.setVisibility(View.VISIBLE);
+                        mEmptyTextViewStart.setText("NO INFO ABOUT INTERNET");
                     }
                 }
                 /*if(intent.getExtras().getBoolean(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false)) {
                     Log.d("app","There's no network connectivity");
                 }*/
                 else{
-                    /*TODO show "no internet" error message if on start (ListView is empty)
-                     *    in the other case show this error at the on of the listView (new items to be loaded)
-                     */
+                    //TODO understand why this case may be possible and why it will be activated
                 }
             }
         };
@@ -237,6 +255,7 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
         mRootView = inflater.inflate(R.layout.fragment_search_recycler, container, false);
         mToolbarSearchView = (SearchView) mRootView.findViewById(R.id.searchView_toolbar_search);
         mTextViewFragmentName = (TextView) mRootView.findViewById(R.id.textView_fragment_name);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.SwipeRefreshLayout_1);
         //mListViewSearchResults = (ListView) mRootView.findViewById(R.id.listView_search_results);
         mRecyclerViewSearchResults = (RecyclerView) mRootView.findViewById(R.id.RecyclerView_search_results);
         mEmptyTextViewStart = (TextView) mRootView.findViewById(R.id.TextView_empty);
@@ -249,6 +268,8 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
         mTextViewFragmentName.setText(mToolbarTitle);
         mTextViewFragmentName.setVisibility(View.GONE);
         mLoadingIndicatorStart.setVisibility(View.GONE);
+
+        //mSwipeRefreshLayout.ref
 
         //Initial state of the SearchView
         mToolbarSearchView.setQueryHint(mSearchHint);
@@ -294,7 +315,7 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
     @Override
     public Loader<ArrayList<BooksVolume>> onCreateLoader(int id, Bundle args){
         Log.e("LOADER", "loader created");
-        mLoaderWorking = true;
+        //mLoaderWorking = true;
 
         boolean newQuery = args.getBoolean("newQuery");
         if (newQuery){
@@ -311,11 +332,11 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
         }
 
         String searchQueryStr = args.getString("query");
-        String inputUrlStr = HTTPQueryUtils.BOOKS_API_START_STR;
+        /*String inputUrlStr = HTTPQueryUtils.BOOKS_API_START_STR;
         inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr +
-                "&startIndex=" + String.valueOf(args.getInt("startIndex"));
+                "&startIndex=" + String.valueOf(args.getInt("startIndex"));*/
 
-        return new BooksLoader(getActivity(), inputUrlStr);
+        return new BooksLoader(getActivity(), searchQueryStr, args.getInt("startIndex"));
     }
 
     @Override
@@ -323,9 +344,11 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
         //clearAdapter
         //mArrayListBooks.clear();
 
+        Log.e("onLoadFinished", "entered " + mNetworkChangeReceiver.getResultData());
+
         mLoadingIndicatorStart.setVisibility(View.GONE);
 
-        if (mArrayListBooks.size() > 0){
+        if (mArrayListBooks.size() > 0 /*&& mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(BooksVolume.LOADING_FOOTER)*/){
             mArrayListBooks.remove(mArrayListBooks.size() - 1);
             mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
             /*mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 9,);*/
@@ -334,13 +357,21 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
             mArrayListBooks.addAll(data);
         }
 
+        if (mCurrentInternetConnection == "DISCONNECTED"){
+            mArrayListBooks.add(new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
+        }
+
         for (int i = 0; i < mArrayListBooks.size(); i++){
             Log.e("ARRAYLISTELEMENTS", i + " " + mArrayListBooks.get(i).getTitle());
         }
         Log.e("-----", "------------");
+
+        mLoaderManager.destroyLoader(0); //TODO looks like this fixes the problem, but the solution seems to be memory-inefficient
+
         Log.e("LOADER", "finished");
 
-        mLoaderWorking = false;
+
+        //mLoaderWorking = false;
     }
 
     @Override

@@ -51,8 +51,58 @@ public class HTTPQueryUtils {
                  Log.e("JSONRESPONSE", "is empty");
                  return null;
              }
-
              return getFeaturesFromJson(jsonResponse);
+        }
+
+        private static BooksVolume getOneFeatureFromJson(JSONObject input){
+            try {
+                JSONObject curVolumeInfo = input.getJSONObject("volumeInfo");
+
+                //getting title
+                String curTitle = curVolumeInfo.getString("title");
+
+                //getting authors
+                JSONArray curAuthors = curVolumeInfo.getJSONArray("authors");
+                ArrayList<String> curAuthorsList = new ArrayList<>();
+                String curAuthorsStr = ""; //TODO may need to change to smth else in the future
+                for (int j = 0; j < curAuthors.length(); j++) {
+                    String curAuthor = curAuthors.getString(j);
+                    curAuthorsList.add(curAuthor);
+                    if (j == 0) {
+                        curAuthorsStr = curAuthorsStr + curAuthor;
+                    } else {
+                        curAuthorsStr = curAuthorsStr + ", " + curAuthor;
+                    }
+                }
+
+                JSONObject curImageLinks = curVolumeInfo.getJSONObject("imageLinks");
+                String curThumbnailUrlStr = curImageLinks.getString("thumbnail");
+                //TODO may need to work with possible null url
+                Bitmap curThumbnail = downloadImage(createUrlFromStr(curThumbnailUrlStr));
+
+                double curRating = BooksVolume.NO_RATING_PROVIDED;
+                if (curVolumeInfo.has("averageRating")) {
+                    curRating = curVolumeInfo.getDouble("averageRating");
+                }
+
+                JSONObject curSaleInfo = input.getJSONObject("saleInfo");
+
+                boolean curIsEBook = curSaleInfo.getBoolean("isEbook");
+
+                String curPrice = BooksVolume.NO_PRICE_PROVIDED;
+
+                if (curSaleInfo.getString("saleability").equals("FOR_SALE")) {
+                    JSONObject curListPrice = curSaleInfo.getJSONObject("listPrice");
+                    curPrice = String.valueOf(curListPrice.getDouble("amount"));
+                    curPrice = curPrice + " " + curListPrice.getString("currencyCode");
+                }
+
+                return new BooksVolume(curTitle, curAuthorsStr, curIsEBook, curPrice, curRating, curThumbnail);
+            }
+            catch(JSONException e){
+                Log.e("JSONPARSING OF ONE", "failed");
+                return new BooksVolume("TEST", "TEST", true, "5.99 EUR", 5.0);
+            }
         }
 
         private static ArrayList<BooksVolume> getFeaturesFromJson(String inputJSON){
@@ -69,52 +119,12 @@ public class HTTPQueryUtils {
                 ArrayList<BooksVolume> curBooks = new ArrayList<>();
                 for (int i = 0; i < items.length(); i++){
                     JSONObject curItem = items.getJSONObject(i);
-                    JSONObject curVolumeInfo = curItem.getJSONObject("volumeInfo");
-
-                    //getting title
-                    String curTitle = curVolumeInfo.getString("title");
-
-                    //getting authors
-                    JSONArray curAuthors = curVolumeInfo.getJSONArray("authors");
-                    ArrayList<String> curAuthorsList = new ArrayList<>();
-                    String curAuthorsStr = ""; //TODO may need to change to smth else in the future
-                    for (int j = 0; j < curAuthors.length(); j++){
-                        String curAuthor = curAuthors.getString(j);
-                        curAuthorsList.add(curAuthor);
-                        if (j == 0){
-                            curAuthorsStr = curAuthorsStr + curAuthor;
-                        }
-                        else{
-                            curAuthorsStr = curAuthorsStr + ", " + curAuthor;
-                        }
+                    //TODO this is a temporary fix, may need to make it load 10 items in any case
+                    BooksVolume newBook = getOneFeatureFromJson(curItem);
+                    if (newBook != null){
+                        curBooks.add(newBook);
+                        Log.e("JSONPARSING ADD ONE", "ok");
                     }
-
-                    JSONObject curImageLinks = curVolumeInfo.getJSONObject("imageLinks");
-                    String curThumbnailUrlStr = curImageLinks.getString("thumbnail");
-                    //TODO may need to work with possible null url
-                    Bitmap curThumbnail = downloadImage(createUrlFromStr(curThumbnailUrlStr));
-
-                    double curRating = BooksVolume.NO_RATING_PROVIDED;
-                    if (curVolumeInfo.has("averageRating")){
-                        curRating = curVolumeInfo.getDouble("averageRating");
-                    }
-
-                    JSONObject curSaleInfo = curItem.getJSONObject("saleInfo");
-
-                    boolean curIsEBook = curSaleInfo.getBoolean("isEbook");
-
-                    String curPrice = BooksVolume.NO_PRICE_PROVIDED;
-
-                    if (curSaleInfo.getString("saleability").equals("FOR_SALE")){
-                        JSONObject curListPrice = curSaleInfo.getJSONObject("listPrice");
-                        curPrice = String.valueOf(curListPrice.getDouble("amount"));
-                        curPrice = curPrice + " " + curListPrice.getString("currencyCode");
-                    }
-
-                    curBooks.add(
-                            new BooksVolume(curTitle, curAuthorsStr, curIsEBook, curPrice, curRating, curThumbnail)
-                    );
-
                 }
 
                 books = curBooks;
@@ -122,7 +132,6 @@ public class HTTPQueryUtils {
             catch(JSONException e){
                 Log.e("JSONPARSING", "failed");
             }
-
             return books;
         }
     }

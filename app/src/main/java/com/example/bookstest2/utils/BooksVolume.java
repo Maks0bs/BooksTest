@@ -2,6 +2,9 @@ package com.example.bookstest2.utils;
 
 import android.graphics.Bitmap;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class BooksVolume {
     private String mTitle = "#####";
     private String mAuthor = "";
@@ -25,6 +28,14 @@ public class BooksVolume {
         mIsEBook = isEBook;
         mPrice = price;
         mRating = rating;
+        RecyclerView.OnScrollListener mTest = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+            }
+
+
+        };
     }
     public BooksVolume(String title, String author, boolean isEBook, String price, double rating, Bitmap thumbnail){
         mTitle = title;
