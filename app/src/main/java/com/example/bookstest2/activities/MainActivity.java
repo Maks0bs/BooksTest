@@ -91,9 +91,20 @@ public class MainActivity extends AppCompatActivity {
 
     /*TODO
     *   !!!IMPORTANT: it may not be possible to create loaders with same IDs in each fragment
+    *   *
+    *   *
     *   Urgent: fix problem with visibility of RecycleView at first (due to RefreshLayout)
-    *   Urgent: handle showing no internet sign when internet is turned off while loading (when bitmaps don't have time to get downloaded)
-    *   Urgent: when going to main screen, while loading, loader gets called 2 times, but onLoadMore only one time (wtf), one element in ArrayList disappears
+    *   *
+    *   *** Block of most likely fixed bugs, but they don't let me sleep at night ***
+    *       * when you leave application (press) home and turn off internet and then go to app again - shit happens
+    *           this has been fixed in the onLoadFInished by removing all loading_footers - but i don't like this solution - there has to be another one
+    *       * when moving to the list of opened apps, while loading the request, some shit happens - more items get counted as added to array, but are not added, so the next response has a shift in regard to the books id
+    *       * handle showing no internet sign when internet is turned off while loading (when bitmaps don't have time to get downloaded)
+    *       * when going to main screen, while loading, loader gets called 2 times, but onLoadMore only one time (wtf), one element in ArrayList disappears
+    *       * there may be some other bugs that I'm not currently aware of and it sucks
+    *   ******
+    *   *
+    *   Urgent: fix Bitmap loading in the case, described above
     *   2) Look to do in HTTPQUERYUTILS
     *   3) Implement api logic!!!
     *   4) Create separate QueryUtils subclasses for each query

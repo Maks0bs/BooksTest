@@ -64,6 +64,11 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
     private String mCurrentQuery = null;
     private String mSearchHint = null;//changed all types to static
     private String mCurrentInternetConnection = null;
+    private static int mLoadingPosition = 0;
+
+    public static void updateLoadingPosition(int value){
+        mLoadingPosition += value;
+    }
 
     //private int mCurrent
 
@@ -106,13 +111,14 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 //loadNextDataFromApi(page);
-                if (mLoaderManager.hasRunningLoaders()){
+                if (mLoaderManager.hasRunningLoaders() ||
+                        mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(BooksVolume.LOADING_FOOTER)){//this check has been added recently and may fix the problem, but i don't like this solution
                     return;
                 }
-                Log.e("LOADMORE", page + " " + totalItemsCount);
+                Log.e("LOADMORE", page + " " + mLoadingPosition);
                 Bundle bundle = new Bundle();
                 bundle.putString("query", mCurrentQuery);
-                bundle.putInt("startIndex", totalItemsCount);//!!!
+                bundle.putInt("startIndex", mLoadingPosition);//!!!
                 bundle.putBoolean("newQuery", false);
                 if (mLoaderManager.getLoader(0) == null){
                     mLoaderManager.initLoader(0, bundle, BooksFragmentRecycler.this);
@@ -170,14 +176,31 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
                         mCurrentInternetConnection = "DISCONNECTED";
                         mToolbarSearchView.setOnQueryTextListener(null);
                         mRecyclerViewSearchResults.removeOnScrollListener(mRecyclerScrollListener);
-                        if (mArrayListBooks.size() == 0 && mLoaderManager.getLoader(0) == null){
+                        if (mArrayListBooks.size() == 0 && !mLoaderManager.hasRunningLoaders()/*mLoaderManager.getLoader(0) == null*/){
                             mEmptyTextViewStart.setVisibility(View.VISIBLE);
                             mEmptyTextViewStart.setText("NO INTERNET");
                         }
+                        else if (mArrayListBooks.size() == 0){
+                            //DO NOTHING
+                        }
                         else{
                             if (mLoaderManager.hasRunningLoaders() &&
-                                mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle() ==
-                                BooksVolume.LOADING_FOOTER){
+                                mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(
+                                BooksVolume.LOADING_FOOTER)){
+
+                                //TODO THIS MAY NOT BE A GOOD SOLUTION FOR LOADING PROBLEM
+                                /*int curPos = 0;
+                                while(curPos < mArrayListBooks.size() - 1){
+                                    if (mArrayListBooks.get(curPos).getTitle().equals(
+                                            BooksVolume.LOADING_FOOTER)){
+
+                                        mArrayListBooks.remove(curPos);
+                                        mBooksAdapter.notifyItemRemoved(curPos);
+                                    }
+                                    else{
+                                        curPos++;
+                                    }
+                                }*/
                                 mArrayListBooks.set(mArrayListBooks.size() - 1,
                                         new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
                                 mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 1);
@@ -319,6 +342,7 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
 
         boolean newQuery = args.getBoolean("newQuery");
         if (newQuery){
+            updateLoadingPosition(-mLoadingPosition);
             mArrayListBooks.clear();
             mLoadingIndicatorStart.setVisibility(View.VISIBLE);
         }
@@ -327,6 +351,7 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
             mBooksAdapter.notifyItemInserted(mArrayListBooks.size() - 1);*/
             //mBooksAdapter.createViewHolder(mRecyclerViewSearchResults, 1);
             mArrayListBooks.add(new BooksVolume(BooksVolume.LOADING_FOOTER));
+            Log.e("LOADING FOOTER", "added to arrayList");
             mBooksAdapter.notifyItemInserted(mArrayListBooks.size());
             //handle viewType in oncreateView and ViewHolder constructor
         }
@@ -336,7 +361,12 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
         inputUrlStr = inputUrlStr + "v1/volumes?q=" + searchQueryStr +
                 "&startIndex=" + String.valueOf(args.getInt("startIndex"));*/
 
-        return new BooksLoader(getActivity(), searchQueryStr, args.getInt("startIndex"));
+        Loader<ArrayList<BooksVolume>> result = new
+                BooksLoader(getActivity(), searchQueryStr, args.getInt("startIndex"));
+
+
+
+        return result;
     }
 
     @Override
@@ -348,7 +378,9 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
 
         mLoadingIndicatorStart.setVisibility(View.GONE);
 
-        if (mArrayListBooks.size() > 0 /*&& mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(BooksVolume.LOADING_FOOTER)*/){
+        if (mArrayListBooks.size() > 0 &&
+                (mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(BooksVolume.LOADING_FOOTER) ||
+                 mArrayListBooks.get(mArrayListBooks.size() - 1).getTitle().equals(BooksVolume.NO_INTERNET_AVAILABLE))){
             mArrayListBooks.remove(mArrayListBooks.size() - 1);
             mBooksAdapter.notifyItemRemoved(mArrayListBooks.size());
             /*mBooksAdapter.notifyItemChanged(mArrayListBooks.size() - 9,);*/
@@ -357,12 +389,26 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
             mArrayListBooks.addAll(data);
         }
 
-        if (mCurrentInternetConnection == "DISCONNECTED"){
+        if (mCurrentInternetConnection.equals("DISCONNECTED")){
+            int curPos = 0;
+            while(curPos < mArrayListBooks.size()){
+                if (mArrayListBooks.get(curPos).getTitle().equals(
+                        BooksVolume.LOADING_FOOTER)){
+
+                    mArrayListBooks.remove(curPos);
+                    mBooksAdapter.notifyItemRemoved(curPos);
+                }
+                else{
+                    curPos++;
+                }
+            }
             mArrayListBooks.add(new BooksVolume(BooksVolume.NO_INTERNET_AVAILABLE));
         }
 
+
+
         for (int i = 0; i < mArrayListBooks.size(); i++){
-            Log.e("ARRAYLISTELEMENTS", i + " " + mArrayListBooks.get(i).getTitle());
+            Log.e("ARRAYLISTELEMENTS", i + " " + mArrayListBooks.get(i).getTitle() + " " + mArrayListBooks.get(i).getThumbnailBitmap());
         }
         Log.e("-----", "------------");
 
@@ -373,6 +419,8 @@ public class BooksFragmentRecycler extends Fragment implements LoaderManager.Loa
 
         //mLoaderWorking = false;
     }
+
+
 
     @Override
     public void onLoaderReset(@NonNull Loader<ArrayList<BooksVolume>> loader) {

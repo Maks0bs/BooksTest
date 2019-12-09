@@ -18,9 +18,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HTTPQueryUtils {
     public static final String BOOKS_API_START_STR = " https://www.googleapis.com/books/";
+
+    //may not have to be static
+    /*public static class BitmapDownloadManager {
+    }*/
 
     public static class BooksQueryManager {
         private String mQueryUrlStr;
@@ -32,7 +37,7 @@ public class HTTPQueryUtils {
         public ArrayList<BooksVolume> retrieveBooksList(){//may not need to be static
             URL url = createUrlFromStr(mQueryUrlStr);
             if (url == null){
-                //Print error
+                Log.e("RETRIEVE BOOKS LIST", "url is null");
                 return null;
             }
 
@@ -49,7 +54,8 @@ public class HTTPQueryUtils {
 
              if (TextUtils.isEmpty(jsonResponse)){
                  Log.e("JSONRESPONSE", "is empty");
-                 return null;
+                 //return null;
+                 return new ArrayList<>();
              }
              return getFeaturesFromJson(jsonResponse);
         }
