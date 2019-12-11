@@ -11,6 +11,7 @@ public class BooksVolume {
     private boolean mIsEBook = false;
     private String mPrice = ""; //may need to change to smth else, there are different currencies that vary from location
     private double mRating = 0.0;
+    private String mThumbnailUrl = null;
     private Bitmap mThumbnailBitmap = null;
     public static final String LOADING_FOOTER = "#####";
     public static final String NO_INTERNET_AVAILABLE = "NO_INTERNET_AVAILABLE";
@@ -28,22 +29,20 @@ public class BooksVolume {
         mIsEBook = isEBook;
         mPrice = price;
         mRating = rating;
-        RecyclerView.OnScrollListener mTest = new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-            }
 
-
-        };
     }
-    public BooksVolume(String title, String author, boolean isEBook, String price, double rating, Bitmap thumbnail){
+    public BooksVolume(String title, String author, boolean isEBook, String price, double rating, Bitmap thumbnail, String thumnbailUrl){
         mTitle = title;
         mAuthor = author;
         mIsEBook = isEBook;
         mPrice = price;
         mRating = rating;
         mThumbnailBitmap = thumbnail;
+        mThumbnailUrl = thumnbailUrl;
+    }
+
+    public void setThumbnailBitmap(Bitmap bitmap){
+        mThumbnailBitmap = bitmap;
     }
 
     public String getTitle(){
@@ -63,5 +62,8 @@ public class BooksVolume {
     }
     public Bitmap getThumbnailBitmap(){
         return mThumbnailBitmap;
+    }
+    public String getThumbnailUrl(){
+        return mThumbnailUrl;
     }
 }

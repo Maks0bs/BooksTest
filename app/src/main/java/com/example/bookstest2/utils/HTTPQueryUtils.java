@@ -23,9 +23,15 @@ import java.util.List;
 public class HTTPQueryUtils {
     public static final String BOOKS_API_START_STR = " https://www.googleapis.com/books/";
 
-    //may not have to be static
-    /*public static class BitmapDownloadManager {
-    }*/
+    public static class HTTPQueryUtilsPublicManager{
+        public HTTPQueryUtilsPublicManager(){
+        }
+
+        public Bitmap downloadImage(String urlStr){
+            URL url = createUrlFromStr(urlStr);
+            return HTTPQueryUtils.downloadImage(url);
+        }
+    }
 
     public static class BooksQueryManager {
         private String mQueryUrlStr;
@@ -103,7 +109,7 @@ public class HTTPQueryUtils {
                     curPrice = curPrice + " " + curListPrice.getString("currencyCode");
                 }
 
-                return new BooksVolume(curTitle, curAuthorsStr, curIsEBook, curPrice, curRating, curThumbnail);
+                return new BooksVolume(curTitle, curAuthorsStr, curIsEBook, curPrice, curRating, curThumbnail, curThumbnailUrlStr);
             }
             catch(JSONException e){
                 Log.e("JSONPARSING OF ONE", "failed");
